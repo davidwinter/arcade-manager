@@ -27,8 +27,12 @@ class ArcadeManager:
         button.connect('clicked', self.play)
         vbox.add(button)
         
+        window.connect('destroy', self.quit)
         window.show_all()
-        #window.fullscreen()
+        window.fullscreen()
+
+    def quit(self, extra):
+        gtk.main_quit()
 
     def key_press(self, widget, key):
         key = gtk.gdk.keyval_name(key.keyval)
