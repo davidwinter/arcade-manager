@@ -51,7 +51,7 @@ class ArcadeManager:
 
     def key_press(self, widget, key):
         key = gtk.gdk.keyval_name(key.keyval)
-        if key == 'Control_L':
+        if key == '1':
             self.play_selected_game()
 
     def get_games(self):
