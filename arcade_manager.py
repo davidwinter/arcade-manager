@@ -2,10 +2,24 @@
  
 import gtk
 import os
+import sys
 
 class ArcadeManager:
 
     def __init__(self):
+
+        """Must ensure that emulators are on system path env variable"""
+        self.emulator = ('dgen', 'Fusion')[sys.platform == 'win32']
+        print self.emulator
+
+        """Get ROM Path"""
+        try:
+            if sys.argv[1] == '-r':
+                self.rom_path = sys.argv[2]
+                print self.rom_path
+        except IndexError:
+            self.rom_path = 'roms/'   
+            print "No ROM path specified, using default."
 
         window = gtk.Window()
         vbox = gtk.VBox()
@@ -41,7 +55,7 @@ class ArcadeManager:
 
     def get_games(self):
         dict = {}
-        for file in os.listdir('roms/'):
+        for file in os.listdir(self.rom_path):
             name = file.replace('.bin', '').replace('_', ' ')
             dict[name] = file
 
