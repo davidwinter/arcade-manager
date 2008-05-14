@@ -71,7 +71,7 @@ class ArcadeManager:
         if index >= 0:
             game = self.games[model[index][0]]
             print game
-            os.system("dgen roms/" + game)
+            os.system(self.emulator + " " + self.rom_path + game)
 
 if __name__ == "__main__":
   app = ArcadeManager()
