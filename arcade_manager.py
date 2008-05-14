@@ -13,13 +13,12 @@ class ArcadeManager:
         print self.emulator
 
         """Get ROM Path"""
-        try:
-            if sys.argv[1] == '-r':
-                self.rom_path = sys.argv[2]
-                print self.rom_path
-        except IndexError:
-            self.rom_path = 'roms/'   
-            print "No ROM path specified, using default."
+        if '-r' in sys.argv:
+            self.rom_path = sys.argv[sys.argv.index('-r') + 1]
+            print self.rom_path
+        else:
+            self.rom_path = 'roms/'
+            print 'Using default roms/'
 
         window = gtk.Window()
         vbox = gtk.VBox()
@@ -43,7 +42,9 @@ class ArcadeManager:
         
         window.connect('destroy', self.quit)
         window.show_all()
-        window.fullscreen()
+
+        if '-f' in sys.argv:
+            window.fullscreen()
 
     def quit(self, extra):
         gtk.main_quit()
