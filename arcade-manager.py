@@ -1,58 +1,106 @@
 #!/usr/bin/env python
  
 import gtk
+import gtk.glade
 import os
 import sys
 
-class ArcadeManager:
+class ArcadeView:
 
     def __init__(self):
 
-        """Must ensure that emulators are on system path env variable"""
-        self.emulator = ('dgen', 'Fusion')[sys.platform == 'win32']
-        print self.emulator
+        self.wTree = gtk.glade.XML('arcade-manager.glade')
+        
+        self.window = self.wTree.get_widget('window')
+        self.games_list = self.wTree.get_widget('games_list')
 
-        """Get ROM Path"""
+        self.window.show_all()
+
+    def build_games_list(self, games):
+
+        self.games_list_store = gtk.ListStore(str)
+        
+        for game in games:
+            self.games_list_store.append([game])
+
+        self.games_column = gtk.TreeViewColumn('Games')
+        self.text_renderer = gtk.CellRendererText()
+        self.games_column.pack_start(self.text_renderer, True)
+        self.games_column.set_attributes(self.text_renderer, text = 0)
+        self.games_list.set_model(self.games_list_store)
+        self.games_list.append_column(self.games_column)
+
+    def get_game_selection(self):
+        (model, iterator) = self.games_list.get_selection().get_selected()
+        
+        if iterator:
+            return model.get_value(iterator, 0)   
+
+class ArcadeController:
+
+    def __init__(self):
+        
+        # Program arguments
         if '-r' in sys.argv:
-            self.rom_path = sys.argv[sys.argv.index('-r') + 1]
-            print self.rom_path
+            rom_path = sys.argv[sys.argv.index('-r') + 1]
         else:
-            self.rom_path = 'roms/'
-            print 'Using default roms/'
-
-        window = gtk.Window()
-        vbox = gtk.VBox()
-        window.add(vbox)
-
-        self.gameChoice = gtk.combo_box_new_text()
+            rom_path = 'roms/'
         
-        self.games = self.get_games()
-        for game in self.games:
-            self.gameChoice.append_text(game)
-            print self.games[game]
-
-        self.gameChoice.set_active(0)
-        self.gameChoice.connect('key_press_event', self.key_press)
-        vbox.add(self.gameChoice)
-
-        button = gtk.Button()
-        button.set_label("Play!")
-        button.connect('clicked', self.play)
-        vbox.add(button)
+        self.environment = ArcadeEnvironment(rom_path)
         
-        window.connect('destroy', self.quit)
-        window.show_all()
+        self.view = ArcadeView()
+        
+        self.view.window.connect('destroy', self.quit)
+        self.view.games_list.connect('key_release_event', 
+            self.games_list_key_release)
 
         if '-f' in sys.argv:
-            window.fullscreen()
+            self.view.window.fullscreen()
+        
+        game_names = []
+        
+        self.games = self.environment.get_games()
+        
+        for game in self.games:
+            game_names.append(game)
+        
+        self.view.build_games_list(game_names)
 
-    def quit(self, extra):
+    def games_list_key_release(self, widget, key):
+        key = gtk.gdk.keyval_name(key.keyval)
+                
+        if key == '1':
+            # Play game
+            game_file = self.games[self.view.get_game_selection()]
+            self.play_game(game_file)
+        
+    def quit(self, window):
         gtk.main_quit()
 
-    def key_press(self, widget, key):
-        key = gtk.gdk.keyval_name(key.keyval)
-        if key == '1':
-            self.play_selected_game()
+    def play_game(self, game):
+        os.system(self.environment.emulator + ' ' +
+                    self.environment.rom_path + game)
+
+class ArcadeEnvironment:
+
+    def __init__(self, rom_path = 'roms/'):
+        self.__determine_os()
+        self.__determine_emulator()
+        self.rom_path = rom_path
+        
+    def __determine_os(self):
+        
+        if sys.platform == 'win32':
+            self.os = 'Windows'
+        elif sys.platform == 'linux2':
+            self.os = 'Linux'
+
+    def __determine_emulator(self):
+        
+        if self.os == 'Windows':
+            self.emulator = 'Fusion'
+        elif self.os == 'Linux':
+            self.emulator = 'dgen'
 
     def get_games(self):
         dict = {}
@@ -61,20 +109,8 @@ class ArcadeManager:
             dict[name] = file
 
         return dict
-    
-    def play(self, button):
-        self.play_selected_game()
-
-    def play_selected_game(self):
-        model = self.gameChoice.get_model()
-        index = self.gameChoice.get_active()
-
-        if index >= 0:
-            game = self.games[model[index][0]]
-            print game
-            os.system(self.emulator + " " + self.rom_path + game)
 
 if __name__ == "__main__":
-  app = ArcadeManager()
+  app = ArcadeController()
   gtk.main()
 
