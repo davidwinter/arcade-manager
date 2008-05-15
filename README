@@ -1,6 +1,8 @@
 Arcade Manager
 ==============
 
+Licence: http://creativecommons.org/licenses/GPL/2.0/
+
 This is a small PyGTK app that I have written to help launch ROMs on my arcade
 machine. The aim was to be able to ditch having to use a keyboard to control
 launching games, and to instead use the arcade controls (which are mapped to
