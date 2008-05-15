@@ -1,0 +1,63 @@
+Arcade Manager
+==============
+
+This is a small PyGTK app that I have written to help launch ROMs on my arcade
+machine. The aim was to be able to ditch having to use a keyboard to control
+launching games, and to instead use the arcade controls (which are mapped to
+keys on a keyboard using a JPAC). After specifying a directory where your ROMs
+are located, it will
+display them in a list view. Having selected a game to play, on pressing the P1
+button (1), it will launch the game in the emulator depending on the system
+you're using. For Windows, this is Fusion, and for Linux it is dgen.
+
+Options:
+
+    * `-f` will make the program run in fullscreen.
+    * `-r` to specify the ROMs directory. Defaults to `roms/`. A leading slash
+        is required.
+
+Example:
+
+    python arcade-manager.py -r C:\roms\ -f
+
+Requirements:
+
+    * Python (this was written on a system using 2.5.2 though an earlier version
+        may work.
+    * PyGTK
+    * dgen if running on Linux
+    * Fusion if running on Windows
+
+Linux
+-----
+
+If running on Linux, it is suggested that you create a ~/.dgen/dgenrc file so
+that you can specify some options.
+
+So that you can easily quit the emulator and choose another game, it is a good
+idea to include a shortcut to do this via the arcade controls. On mine I have it
+set to `CTRL + 2`. This is the P1 A button and the P2 Start button.
+
+Also, ensure that you have `bool_fullscreen = true` so that when dgen runs, it
+does so in fullscreen.
+
+Windows
+-------
+
+On Windows, it is a little trickier to quit the Fusion emulator as there is no
+configuration you can set. Instead you need to create a batch file which can be
+executed via a shortcut key. The following is an example batch file:
+
+    @echo off
+    taskkill /f /im Fusion.exe
+
+Create a shortcut to this batch file (right click, Create Shortcut). Place the
+shortcut on the desktop. This is extremely important, otherwise the shortcut key
+doesn't work. It is a Windows restriction. Go to the properties of the shortcut
+and assign a shortcut key. On mine, I have done `CTRL + ALT + 2`. This
+corresponds to P1 (A + B) and P2 Start buttons. When you press this combination,
+the batch file will run, killing the Fusion emulator task.
+
+When first launching the Fusion emulator, enter Fullscreen mode by pressing
+`ESC`. Then run the batch file and it will save the setting and always open in
+fullscreen mode.
