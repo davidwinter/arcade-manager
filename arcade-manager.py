@@ -94,6 +94,8 @@ class ArcadeEnvironment:
             self.os = 'Windows'
         elif sys.platform == 'linux2':
             self.os = 'Linux'
+        elif sys.platform == 'darwin':
+            self.os = 'Mac'
 
     def __determine_emulator(self):
         
@@ -101,6 +103,8 @@ class ArcadeEnvironment:
             self.emulator = 'Fusion'
         elif self.os == 'Linux':
             self.emulator = 'dgen'
+        elif self.os == 'Mac':
+            self.emulator = 'open -a Genesis\ Plus'
 
     def get_games(self):
         dict = {}
